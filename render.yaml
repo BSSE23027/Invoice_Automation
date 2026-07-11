@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fbr-invoice-automation
+    runtime: python
+
+    buildCommand: "./build.sh"
+
+    startCommand: "gunicorn config.wsgi:application"
+
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+
+      - key: DEBUG
+        value: "False"

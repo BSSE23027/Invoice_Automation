@@ -1,6 +1,6 @@
 import os
 import base64
-
+from invoice_app.utils.google_credentials import write_google_files
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -10,7 +10,7 @@ from invoice_app.config import GMAIL_QUERY
 
 # Gmail API scope (read-only access)
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-
+credentials_path, token_path = write_google_files()
 
 class GmailService:
     def __init__(self):
@@ -23,9 +23,9 @@ class GmailService:
         """
         creds = None
 
-        if os.path.exists("token.json"):
+        if token_path.exists():
             creds = Credentials.from_authorized_user_file(
-                "token.json",
+                str(token_path),
                 SCOPES
             )
 
@@ -36,13 +36,13 @@ class GmailService:
 
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json",
+                    str(credentials_path),
                     SCOPES
                 )
 
                 creds = flow.run_local_server(port=0)
 
-            with open("token.json", "w") as token:
+            with open(token_path, "w") as token:
                 token.write(creds.to_json())
 
         return build(
